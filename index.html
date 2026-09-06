@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Ultime Tap — Le clicker qui ne s'arrête jamais</title>
+<meta name="description" content="L'Ultime Tap : un jeu de clicker/incrémental sur Android. Débloquez des améliorations, enchaînez les combos, montez en Prestige et grimpez au classement mondial.">
+<meta name="theme-color" content="#3a3468">
+<meta property="og:title" content="L'Ultime Tap — Le clicker qui ne s'arrête jamais">
+<meta property="og:description" content="Tapez, progressez, devenez l'ultime. Disponible gratuitement sur Google Play.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/shot-jeu.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-a: #b6683a;
+    --bg-b: #3a5a86;
+    --bg-c: #4a3e86;
+    --bg-d: #6a3d86;
+    --ink: #100c1c;
+    --paper: #F6F3FF;
+    --paper-soft: #C9C3E0;
+    --glass: rgba(20, 15, 35, 0.45);
+    --glass-border: rgba(255,255,255,0.14);
+    --glass-strong: rgba(12, 9, 22, 0.65);
+    --orange: #FF7A50;
+    --orange-deep: #FF4D6D;
+    --purple: #9B6BFF;
+    --blue: #4FA8E8;
+    --green: #33D69F;
+    --yellow: #FFC145;
+    --radius-lg: 26px;
+    --radius-md: 16px;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:
+      radial-gradient(circle at 15% 10%, var(--bg-a) 0%, transparent 45%),
+      radial-gradient(circle at 85% 90%, var(--bg-d) 0%, transparent 50%),
+      linear-gradient(150deg, #6b4a3a 0%, #3a4f7a 38%, #443a80 65%, #5a3a80 100%);
+    background-attachment: fixed;
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .display{
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: #FFFFFF;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; background:none; }
+  img{ display:block; max-width:100%; }
+
+  .wrap{ max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+  /* ---------- NAV ---------- */
+  header{
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(16, 12, 28, 0.55);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--glass-border);
+  }
+  nav{
+    position: relative;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 16px 32px; max-width: 1120px; margin: 0 auto;
+  }
+  .logo{ display:flex; align-items:center; gap:10px; font-family:'Fredoka', sans-serif; font-size: 1.25rem; font-weight:700; color:#fff; }
+  .logo-mark{
+    width: 36px; height:36px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-deep));
+    display:flex; align-items:center; justify-content:center;
+    color:white; font-size:1.1rem;
+  }
+  .nav-links{ display:flex; gap:30px; font-weight:600; font-size:0.92rem; color: var(--paper-soft); }
+  .nav-links a:hover{ color: #fff; }
+  .nav-cta{
+    background: linear-gradient(135deg, var(--orange), var(--orange-deep));
+    color: #fff; padding: 10px 20px; border-radius: 100px;
+    font-weight:700; font-size:0.9rem;
+  }
+  .nav-burger{
+    display:none; width: 40px; height:40px; border-radius: 10px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    align-items:center; justify-content:center; color:#fff; font-size:1.2rem;
+  }
+  @media (max-width: 760px){
+    .nav-links{
+      display:none; position:absolute; top: 100%; left:0; right:0;
+      flex-direction:column; gap:0; background: rgba(16,12,28,0.97);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .nav-links.open{ display:flex; }
+    .nav-links a{ padding: 16px 32px; border-top: 1px solid var(--glass-border); }
+    .nav-burger{ display:flex; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding: 68px 32px 30px; overflow:hidden; }
+  .hero-grid{
+    max-width: 1120px; margin: 0 auto;
+    display:grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items:center;
+  }
+  @media (max-width: 900px){ .hero-grid{ grid-template-columns: 1fr; } }
+
+  .hero-grid > div{ animation: heroRise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .hero-grid > .tap-card{ animation-delay: 0.12s; }
+  @keyframes heroRise{
+    from{ opacity:0; transform: translateY(18px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero-grid > div{ animation:none; }
+  }
+
+  .eyebrow-badge{
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    padding: 7px 16px; border-radius: 100px; font-weight:600; font-size: 0.85rem;
+    margin-bottom: 22px; color: var(--paper);
+  }
+  .eyebrow-badge b{ color: var(--yellow); }
+
+  .hero h1{ font-size: clamp(2.3rem, 5.2vw, 3.6rem); margin-bottom: 20px; }
+  .hero h1 .accent{
+    background: linear-gradient(135deg, var(--orange), var(--orange-deep));
+    -webkit-background-clip: text; background-clip:text; color: transparent;
+  }
+  .hero p.lede{ font-size: 1.1rem; color: var(--paper-soft); max-width: 46ch; margin-bottom: 30px; }
+
+  .store-row{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom: 30px; align-items:center; }
+  .store-btn{
+    display:flex; align-items:center; gap:10px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-deep));
+    color:white; padding: 13px 22px; border-radius: var(--radius-md);
+    font-weight:700; transition: transform 0.15s ease;
+  }
+  .store-btn small{ display:block; font-weight:500; font-size:0.68rem; opacity:0.85; }
+  .store-btn span.label{ font-size:1rem; }
+  .store-btn:hover{ transform: translateY(-3px); }
+  .store-btn.disabled{
+    background: var(--glass); border: 1px solid var(--glass-border); color: var(--paper-soft);
+    cursor: default;
+  }
+  .store-btn.disabled:hover{ transform:none; }
+
+  .hero-stats{ display:flex; gap: 28px; flex-wrap:wrap; }
+  .hero-stats strong{ font-family:'Fredoka',sans-serif; font-size:1.4rem; display:block; color:#fff; }
+  .hero-stats span{ color: var(--paper-soft); font-size:0.85rem; }
+
+  /* --- Tap demo --- */
+  .tap-card{
+    position:relative; background: var(--glass); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    border-radius: var(--radius-lg); box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    padding: 30px 24px 34px; text-align:center; isolation: isolate;
+  }
+  .tap-card .score-label{ font-size:0.8rem; font-weight:600; color: var(--paper-soft); margin-bottom: 4px; }
+  .tap-score{ font-family:'Fredoka', sans-serif; font-size: 2.8rem; font-weight:700; margin-bottom: 4px; color:#fff; font-variant-numeric: tabular-nums; }
+  .tap-combo{ font-size:0.85rem; font-weight:600; color: var(--green); height: 18px; margin-bottom: 16px; }
+
+  .tap-button-zone{ position:relative; display:flex; justify-content:center; align-items:center; height: 200px; }
+
+  .tap-button{
+    width: 160px; height: 160px; border-radius: 34px;
+    background: linear-gradient(150deg, var(--orange) 0%, var(--orange-deep) 100%);
+    box-shadow: 0 10px 0 #C93E58, 0 10px 30px rgba(0,0,0,0.4);
+    display:flex; align-items:center; justify-content:center;
+    color:white; font-family:'Fredoka', sans-serif; font-weight:700; font-size:1.05rem;
+    letter-spacing: 0.02em; transition: transform 0.06s ease; user-select:none;
+  }
+  .tap-button:active{ transform: translateY(8px); box-shadow: 0 2px 0 #C93E58, 0 4px 14px rgba(0,0,0,0.4); }
+
+  .float-num{
+    position:absolute; font-family:'Fredoka', sans-serif; font-weight:700; color: var(--yellow);
+    pointer-events:none; animation: floatUp 0.9s ease-out forwards; font-size: 1.1rem;
+  }
+  @keyframes floatUp{
+    0%{ opacity:1; transform: translateY(0) scale(1); }
+    100%{ opacity:0; transform: translateY(-70px) scale(1.15); }
+  }
+  .tap-hint{ margin-top: 12px; font-size:0.78rem; color: var(--paper-soft); }
+
+  @media (prefers-reduced-motion: reduce){
+    .float-num{ animation:none; opacity:0; }
+    *{ transition:none !important; }
+  }
+
+  /* ---------- SECTION SHELL ---------- */
+  section{ padding: 84px 32px; }
+  .section-head{ max-width: 640px; margin-bottom: 48px; }
+  .section-head .kicker{ display:inline-block; color: var(--yellow); font-weight:700; font-size:0.88rem; margin-bottom:10px; }
+  .section-head h2{ font-size: clamp(1.75rem, 3.4vw, 2.5rem); margin-bottom: 14px; }
+  .section-head p{ color: var(--paper-soft); font-size:1.03rem; }
+  .section-head.center{ margin-left:auto; margin-right:auto; text-align:center; }
+
+  /* ---------- ABOUT / VIDEO ---------- */
+  .about-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items:center; }
+  @media (max-width: 900px){ .about-grid{ grid-template-columns:1fr; } }
+
+  .video-frame{
+    position:relative; border-radius: var(--radius-lg); overflow:hidden;
+    border: 1px solid var(--glass-border); box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    background: var(--glass-strong);
+  }
+  .video-frame video{ width:100%; display:block; max-height: 480px; }
+
+  .about-copy p{ color: var(--paper-soft); margin-bottom: 18px; font-size:1.03rem; }
+  .about-copy p:last-child{ margin-bottom:0; }
+
+  /* ---------- FEATURES ---------- */
+  .features-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 900px){ .features-grid{ grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 620px){ .features-grid{ grid-template-columns: 1fr; } }
+
+  .feature-card{
+    background: var(--glass); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius-lg); padding: 26px 22px;
+  }
+  .feature-icon{
+    width: 48px; height:48px; border-radius: 14px;
+    display:flex; align-items:center; justify-content:center; font-size: 1.3rem; margin-bottom: 16px;
+  }
+  .feature-card:nth-child(1) .feature-icon{ background: rgba(255,122,80,0.18); }
+  .feature-card:nth-child(2) .feature-icon{ background: rgba(155,107,255,0.2); }
+  .feature-card:nth-child(3) .feature-icon{ background: rgba(79,168,232,0.2); }
+  .feature-card:nth-child(4) .feature-icon{ background: rgba(51,214,159,0.18); }
+  .feature-card:nth-child(5) .feature-icon{ background: rgba(255,193,69,0.2); }
+  .feature-card:nth-child(6) .feature-icon{ background: rgba(255,77,109,0.18); }
+
+  .feature-card h3{ font-size: 1.1rem; margin-bottom: 8px; }
+  .feature-card p{ color: var(--paper-soft); font-size:0.94rem; }
+
+  /* ---------- SCREENSHOTS ---------- */
+  .screen-row{
+    display:flex; gap: 20px; overflow-x:auto; padding-bottom: 14px; scroll-snap-type: x mandatory;
+  }
+  .screen-frame{
+    flex: 0 0 210px; scroll-snap-align:start;
+    border-radius: 26px; border: 1px solid var(--glass-border);
+    overflow:hidden; box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    background: var(--glass-strong);
+  }
+  .screen-frame img{
+    width:100%; aspect-ratio: 9/19.5; object-fit: cover; object-position: top;
+  }
+  .screen-frame .screen-caption{
+    padding: 12px 14px; font-size:0.82rem; font-weight:700; color:#fff;
+  }
+
+  /* ---------- TESTIMONIALS ---------- */
+  .quotes-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+  @media (max-width: 900px){ .quotes-grid{ grid-template-columns:1fr; } }
+  .quote-card{ background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); border-radius: var(--radius-lg); padding: 24px; }
+  .quote-stars{ color: var(--yellow); font-size:1rem; margin-bottom:14px; letter-spacing:2px; }
+  .quote-card p{ font-size:0.98rem; margin-bottom:18px; color: var(--paper); }
+  .quote-person{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:0.88rem; }
+  .quote-avatar{ width:34px; height:34px; border-radius:50%; background: linear-gradient(135deg, var(--purple), var(--blue)); }
+  .quote-card:nth-child(2) .quote-avatar{ background: linear-gradient(135deg, var(--orange), var(--orange-deep)); }
+  .quote-card:nth-child(3) .quote-avatar{ background: linear-gradient(135deg, var(--green), var(--blue)); }
+
+  /* ---------- FAQ ---------- */
+  .faq-list{ max-width: 760px; }
+  .faq-item{ border-bottom: 1px solid var(--glass-border); padding: 20px 0; }
+  .faq-item summary{
+    cursor:pointer; font-weight:700; font-size:1.02rem; color:#fff;
+    display:flex; justify-content:space-between; align-items:center; list-style:none;
+  }
+  .faq-item summary::-webkit-details-marker{ display:none; }
+  .faq-item summary::after{
+    content:'+'; font-family:'Fredoka',sans-serif; font-size:1.3rem; color: var(--orange);
+    transition: transform 0.2s ease;
+  }
+  .faq-item[open] summary::after{ transform: rotate(45deg); }
+  .faq-item p{ color: var(--paper-soft); margin-top: 12px; max-width: 62ch; }
+
+  /* ---------- FINAL CTA ---------- */
+  .final-cta{
+    background: var(--glass-strong); border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border); text-align:center;
+  }
+  .final-cta h2{ font-size: clamp(1.9rem, 3.8vw, 2.8rem); margin-bottom:16px; }
+  .final-cta p{ color: var(--paper-soft); margin-bottom: 28px; font-size:1.05rem; }
+  .final-cta .store-row{ justify-content:center; }
+
+  /* ---------- FOOTER ---------- */
+  footer{ padding: 44px 32px 30px; }
+  .footer-row{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 16px;
+    padding-top: 22px; border-top: 1px solid var(--glass-border); margin-top: 22px;
+    font-size:0.84rem; color: var(--paper-soft);
+  }
+  .footer-links{ display:flex; gap:20px; }
+  .footer-links a:hover{ color:#fff; }
+
+  .social-row{ display:flex; gap: 12px; margin-top: 18px; }
+  .social-link{
+    width: 42px; height:42px; border-radius: 12px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    display:flex; align-items:center; justify-content:center; font-size:1.15rem;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .social-link:hover{ transform: translateY(-3px); background: rgba(255,255,255,0.12); }
+
+  ::selection{ background: var(--yellow); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span class="logo-mark">🔥</span>L'Ultime Tap</div>
+    <div class="nav-links" id="navLinks">
+      <a href="#jeu">Le jeu</a>
+      <a href="#fonctionnalites">Fonctionnalités</a>
+      <a href="#captures">Captures</a>
+      <a href="#avis">Avis</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <a href="#telecharger" class="nav-cta">Télécharger</a>
+      <button class="nav-burger" id="navBurger" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <span class="eyebrow-badge">🔥 <b>Apprenti cliqueur</b> · disponible sur Android</span>
+      <h1>Tapez. Progressez.<br>Devenez <span class="accent">l'ultime</span>.</h1>
+      <p class="lede">L'Ultime Tap transforme chaque appui en petite victoire. Débloquez des améliorations, enchaînez les combos, montez en Prestige et grimpez dans le classement mondial.</p>
+      <div class="store-row" id="telecharger">
+        <a href="#" class="store-btn">
+          <span>▶</span>
+          <span><small>Disponible sur</small><span class="label">Google Play</span></span>
+        </a>
+        <span class="store-btn disabled">
+          <span>🍎</span>
+          <span><small>Bientôt sur</small><span class="label">App Store</span></span>
+        </span>
+      </div>
+      <div class="hero-stats">
+        <div><strong>106</strong><span>succès à débloquer</span></div>
+        <div><strong>21</strong><span>boosts de Prestige</span></div>
+        <div><strong>0€</strong><span>pour commencer à jouer</span></div>
+      </div>
+    </div>
+
+    <div class="tap-card">
+      <div class="score-label">Votre score</div>
+      <div class="tap-score" id="tapScore">0</div>
+      <div class="tap-combo" id="tapCombo"></div>
+      <div class="tap-button-zone" id="tapZone">
+        <button class="tap-button" id="tapButton">CLIQUE !</button>
+      </div>
+      <div class="tap-hint">Essayez la démo — c'est exactement comme dans l'app</div>
+    </div>
+  </div>
+</section>
+
+<section id="jeu">
+  <div class="wrap about-grid">
+    <div class="video-frame">
+      <video controls preload="metadata" poster="assets/shot-jeu.jpg">
+        <source src="assets/video-promo.mp4" type="video/mp4">
+        Votre navigateur ne supporte pas la lecture vidéo.
+      </video>
+    </div>
+    <div class="about-copy">
+      <span class="eyebrow-badge">Le concept</span>
+      <h2>Un jeu simple à jouer, difficile à lâcher</h2>
+      <p>Dans L'Ultime Tap, chaque appui rapporte des points. Utilisez-les pour débloquer des améliorations de clic et des générateurs passifs qui font monter votre score même à l'arrêt.</p>
+      <p>Enchaînez les combos pour faire grimper votre multiplicateur, remplissez vos missions du jour, puis lancez un Prestige pour convertir votre progression en gemmes et en bonus permanents.</p>
+      <p>Comparez votre score au classement mondial, personnalisez l'app à votre goût, et suivez toute votre progression dans l'onglet Stats.</p>
+    </div>
+  </div>
+</section>
+
+<section id="fonctionnalites">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Fonctionnalités</span>
+      <h2>Tout ce qu'il faut pour ne jamais s'arrêter de progresser</h2>
+      <p>Une boucle de jeu complète, pensée pour les sessions de deux minutes comme pour les marathons d'un après-midi.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Boutique d'améliorations</h3>
+        <p>Des dizaines d'améliorations de clic et de générateurs passifs, du Doigt en acier au Poing titanesque.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔥</div>
+        <h3>Prestige & gemmes</h3>
+        <p>Réinitialisez votre run pour gagner des gemmes et débloquer boosts, skins et compagnons permanents.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>Classement mondial</h3>
+        <p>Choisissez votre pseudo et comparez votre meilleur score aux autres joueurs, en Top 50 ou autour de vous.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Missions du jour</h3>
+        <p>De nouveaux défis chaque jour pour gagner des points bonus avant minuit.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <h3>Stats & collection</h3>
+        <p>Suivez vos records, votre meilleur combo, et débloquez des dizaines de badges de collection.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Personnalisation</h3>
+        <p>Thèmes de couleur, taille du bouton, nombres compacts, vibrations : réglez l'app à votre façon.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="captures">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Aperçu</span>
+      <h2>Un tour complet de l'application</h2>
+      <p>De l'écran de jeu jusqu'au classement mondial, voici à quoi ressemble L'Ultime Tap.</p>
+    </div>
+    <div class="screen-row">
+      <div class="screen-frame"><img src="assets/shot-jeu.jpg" alt="Écran de jeu principal" loading="lazy"><div class="screen-caption">Écran de jeu</div></div>
+      <div class="screen-frame"><img src="assets/shot-boutique.jpg" alt="Boutique d'améliorations" loading="lazy"><div class="screen-caption">Boutique</div></div>
+      <div class="screen-frame"><img src="assets/shot-missions.jpg" alt="Missions du jour" loading="lazy"><div class="screen-caption">Missions du jour</div></div>
+      <div class="screen-frame"><img src="assets/shot-stats.jpg" alt="Statistiques et collection" loading="lazy"><div class="screen-caption">Stats & collection</div></div>
+      <div class="screen-frame"><img src="assets/shot-prestige.jpg" alt="Écran de Prestige" loading="lazy"><div class="screen-caption">Prestige</div></div>
+      <div class="screen-frame"><img src="assets/shot-classement.jpg" alt="Classement mondial" loading="lazy"><div class="screen-caption">Classement mondial</div></div>
+      <div class="screen-frame"><img src="assets/shot-options.jpg" alt="Options de personnalisation" loading="lazy"><div class="screen-caption">Options</div></div>
+      <div class="screen-frame"><img src="assets/shot-nouveautes.jpg" alt="Journal des nouveautés" loading="lazy"><div class="screen-caption">Nouveautés</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="avis">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Avis des joueurs</span>
+      <h2>Ce qu'en pensent les premiers testeurs</h2>
+    </div>
+    <div class="quotes-grid">
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <p>Je pensais lancer l'app cinq minutes avant de dormir, j'ai fini par débloquer trois nouveaux paliers.</p>
+        <div class="quote-person"><div class="quote-avatar"></div>Manon, joueuse bêta</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <p>Le système de combo change tout. On sent vraiment la progression à chaque partie.</p>
+        <div class="quote-person"><div class="quote-avatar"></div>Karim, joueur bêta</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <p>Le Prestige et les gemmes donnent une vraie raison de tout recommencer. Très addictif.</p>
+        <div class="quote-person"><div class="quote-avatar"></div>Lucie, joueuse bêta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker">Questions fréquentes</span>
+      <h2>Avant de télécharger</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>Sur quelles plateformes le jeu est-il disponible ?</summary>
+        <p>L'Ultime Tap est disponible sur Google Play (Android). Une version iOS n'est pas encore disponible, mais elle pourrait arriver selon l'accueil du jeu.</p>
+      </details>
+      <details class="faq-item">
+        <summary>L'Ultime Tap est-il gratuit ?</summary>
+        <p>Oui, le jeu est gratuit à télécharger et à jouer. Une pub optionnelle permet de booster ses points, sans jamais être obligatoire.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Faut-il une connexion internet ?</summary>
+        <p>La majorité du jeu se joue hors ligne. Une connexion est utile pour le classement mondial et la génération de points hors-ligne.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Ma progression est-elle sauvegardée ?</summary>
+        <p>Oui, votre progression est sauvegardée automatiquement dès que vous jouez.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="wrap">
+    <h2>Prêt à devenir l'ultime tapeur ?</h2>
+    <p>Téléchargez L'Ultime Tap sur Google Play et commencez à grimper dans le classement mondial.</p>
+    <div class="store-row">
+      <a href="#" class="store-btn"><span>▶</span><span><small>Disponible sur</small><span class="label">Google Play</span></span></a>
+      <span class="store-btn disabled"><span>🍎</span><span><small>Bientôt sur</small><span class="label">App Store</span></span></span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="logo-mark">🔥</span>L'Ultime Tap</div>
+    <p style="color:var(--paper-soft); margin-top:14px; max-width:44ch;">Suivez le développement du jeu et les prochaines mises à jour.</p>
+    <div class="social-row">
+      <a href="#" class="social-link" aria-label="TikTok">🎵</a>
+      <a href="#" class="social-link" aria-label="Instagram">📷</a>
+      <a href="#" class="social-link" aria-label="Site officiel">🌐</a>
+    </div>
+    <div class="footer-row">
+      <span>© 2026 L'Ultime Tap. Tous droits réservés.</span>
+      <div class="footer-links">
+        <a href="#jeu">Le jeu</a>
+        <a href="#fonctionnalites">Fonctionnalités</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    const burger = document.getElementById('navBurger');
+    const navLinks = document.getElementById('navLinks');
+    if (burger && navLinks){
+      burger.addEventListener('click', function(){
+        const isOpen = navLinks.classList.toggle('open');
+        burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        burger.textContent = isOpen ? '✕' : '☰';
+      });
+      navLinks.querySelectorAll('a').forEach(function(link){
+        link.addEventListener('click', function(){
+          navLinks.classList.remove('open');
+          burger.setAttribute('aria-expanded', 'false');
+          burger.textContent = '☰';
+        });
+      });
+    }
+  })();
+
+  (function(){
+    const btn = document.getElementById('tapButton');
+    const scoreEl = document.getElementById('tapScore');
+    const comboEl = document.getElementById('tapCombo');
+    const zone = document.getElementById('tapZone');
+
+    let score = 0;
+    let combo = 0;
+    let comboTimer = null;
+
+    function formatScore(n){ return n.toLocaleString('fr-FR'); }
+
+    function spawnFloatNumber(gain, x, y){
+      const el = document.createElement('div');
+      el.className = 'float-num';
+      el.textContent = '+' + gain;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      zone.appendChild(el);
+      setTimeout(() => el.remove(), 950);
+    }
+
+    btn.addEventListener('click', function(){
+      combo += 1;
+      const multiplier = 1 + Math.floor(combo / 8);
+      score += multiplier;
+      scoreEl.textContent = formatScore(score);
+      comboEl.textContent = combo >= 8 ? 'Combo x' + multiplier + ' !' : '';
+
+      const rect = zone.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      const x = (btnRect.left - rect.left) + btnRect.width / 2 + (Math.random() * 40 - 20);
+      const y = (btnRect.top - rect.top) + 20;
+      spawnFloatNumber(multiplier, x, y);
+
+      clearTimeout(comboTimer);
+      comboTimer = setTimeout(() => { combo = 0; comboEl.textContent = ''; }, 1500);
+    });
+  })();
+</script>
+
+</body>
+</html>
